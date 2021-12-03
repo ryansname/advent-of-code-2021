@@ -7,7 +7,7 @@ const eql = std.mem.eql;
 const indexOf = std.mem.indexOf;
 const parseInt = std.fmt.parseInt;
 
-const REAL_INPUT = @embedFile("inputs/day2.txt");
+const REAL_INPUT = @embedFile("inputs/day02.txt");
 
 pub fn main() !void {
     try part1(REAL_INPUT);
