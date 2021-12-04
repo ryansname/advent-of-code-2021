@@ -35,7 +35,7 @@ pub const Parser = struct {
     pub fn takeType(self: *Parser, comptime T: type, needles: []const u8) !T {
         const result_string = try self.takeUntil(needles);
         switch (@typeInfo(T)) {
-            .Int => return try std.fmt.parseInt(T, result_string, 10),
+            .Int => return std.fmt.parseInt(T, result_string, 10),
             .Float => return try std.fmt.parseFloat(T, result_string),
             else => return error.UnsupportedType,
         }
