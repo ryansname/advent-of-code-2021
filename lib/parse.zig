@@ -14,8 +14,13 @@ pub const Parser = struct {
         };
     }
 
+    pub fn hasMore(self: Parser) bool {
+        return self.index < self.source.len;
+    }
+
     pub fn skipNewLine(self: *Parser) !void {
-        if (self.source[self.index] == ' ') return error.NotAtSpace;
+        if (!self.hasMore()) return;
+        if (self.source[self.index] != '\n') return error.NotAtSpace;
         self.index += 1;
     }
 
@@ -34,6 +39,18 @@ pub const Parser = struct {
 
     pub fn takeType(self: *Parser, comptime T: type, needles: []const u8) !T {
         const result_string = try self.takeUntil(needles);
+        switch (@typeInfo(T)) {
+            .Int => return std.fmt.parseInt(T, result_string, 10),
+            .Float => return try std.fmt.parseFloat(T, result_string),
+            else => return error.UnsupportedType,
+        }
+    }
+
+    pub fn takeTypeByCount(self: *Parser, comptime T: type, count: usize) !T {
+        const start = self.index;
+        self.index += count;
+        var result_string = self.source[start..self.index];
+        result_string = mem.trim(u8, result_string, &std.ascii.spaces);
         switch (@typeInfo(T)) {
             .Int => return std.fmt.parseInt(T, result_string, 10),
             .Float => return try std.fmt.parseFloat(T, result_string),
