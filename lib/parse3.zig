@@ -64,6 +64,30 @@ pub const Parser = struct {
             else => return error.UnsupportedType,
         }
     }
+
+    pub fn takeTypeByCount(self: *Parser, comptime T: type, count: usize) !?T {
+        if (!self.hasMore()) return null;
+
+        const start = self.index;
+        self.index += count;
+        
+        if (self.index > self.source.len) return error.CouldNotTakeEntireCount;
+
+        const result_string = self.source[start..self.index];
+
+        switch (@typeInfo(T)) {
+            .Int => return try std.fmt.parseInt(T, result_string, 10),
+            .Float => return try std.fmt.parseFloat(T, result_string),
+            .Pointer => |P| switch (@typeInfo(P.child)) {
+                .Int => |C| {
+                    assert(C.bits == 8);
+                    return result_string;
+                },
+                else => return error.UnsupportedType,
+            },
+            else => return error.UnsupportedType,
+        }
+    }
 };
 
 const expectEqual = std.testing.expectEqual;
