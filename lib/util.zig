@@ -4,6 +4,11 @@ const print = std.debug.print;
 
 const assert = std.debug.assert;
 
+pub fn dbg(src: std.builtin.SourceLocation, value: anytype) @TypeOf(value) {
+    print("{s: >30}:{}:{}>\t{any}\n", .{src.file, src.line, src.column, value});
+    return value;
+}
+
 pub fn assertPrint(condition: bool, comptime fmt: []const u8, args: anytype) void {
     if (!condition) {
         print(fmt ++ "\n", args);
